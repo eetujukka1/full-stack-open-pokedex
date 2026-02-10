@@ -31,9 +31,11 @@ jobs:
       - name: Trigger deployment
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '#skip') == false }}
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+
+
       - name: Notify Discord on success
         if: ${{ success() }}
-        uses: rjstone/discord-webhook-notify@9a20ac02515f8dc588cfe571ca05f000008edf29
+        uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           username: GitHub
@@ -42,17 +44,20 @@ jobs:
           color: '#00ff8c'
           description: "to https://full-stack-open-pokedex-i5lc.onrender.com/ by ${{ github.actor }}"
           footer: "Severity: info Today at ${{ github.event.head_commit.timestamp }}"
-      - name: Notify Discord on failure
-        if: ${{ failure() }}
-        uses: rjstone/discord-webhook-notify@9a20ac02515f8dc588cfe571ca05f000008edf29
+      - name: Notify Discord on success
+        if: ${{ success() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          username: GitHub
-          text: A new version of Pokedex failed to deploy
-          severity: error
-          color: '#ff0000'
-          description: "commit ${{ github.event.head_commit.url }} by ${{ github.actor }} broke the build"
-          footer: "Severity: error Today at ${{ github.event.head_commit.timestamp }}"
+          args: "A new version of {{ EVENT_PAYLOAD.repository.full_name }} has been deployed to https://full-stack-open-pokedex-i5lc.onrender.com/."
+      - name: Notify Discord on success
+        if: ${{ failure() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554
+        with:
+          args: "Commit ${{ github.event.head_commit.url }} by ${{ github.actor }} broke the build."
 
   tag_release:
     needs: [simple_deployment_pipeline]
