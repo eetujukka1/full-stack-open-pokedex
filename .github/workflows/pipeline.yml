@@ -35,15 +35,15 @@ jobs:
         if: ${{ success() }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_USERNAME: "Pokedex deployment"
-          DISCORD_EMBEDS: '{"title": "Success", "color": "144238144", "description": "A new version of {{ EVENT_PAYLOAD.repository.full_name }} has been deployed to https://full-stack-open-pokedex-i5lc.onrender.com/."}'
+          DISCORD_USERNAME: "Pokedex deployment bot"
+          DISCORD_EMBEDS: '{embeds: [{"title": "Success", "color": "144238144", "description": "A new version of {{ EVENT_PAYLOAD.repository.full_name }} has been deployed to https://full-stack-open-pokedex-i5lc.onrender.com/."}]}'
         uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554
       - name: Notify Discord on failure
         if: ${{ failure() }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_USERNAME: "Pokedex deployment"
-          DISCORD_EMBEDS: '{"title": "Failure", "color": "255043", "description": "Commit ${{ github.event.head_commit.url }} by ${{ github.actor }} broke the build."}'
+          DISCORD_USERNAME: "Pokedex deployment bot"
+          DISCORD_EMBEDS: '{embeds: [{"title": "Failure", "color": "255043", "description": "Commit ${{ github.event.head_commit.url }} by ${{ github.actor }} broke the build."}]}'
         uses: Ilshidur/action-discord@d2594079a10f1d6739ee50a2471f0ca57418b554
 
   tag_release:
